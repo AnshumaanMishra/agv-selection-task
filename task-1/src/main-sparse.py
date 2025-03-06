@@ -7,7 +7,9 @@ feature_params = dict(maxCorners = 300, qualityLevel = 0.2, minDistance = 2, blo
 # Parameters for Lucas-Kanade optical flow
 lk_params = dict(winSize = (15,15), maxLevel = 2, criteria = (cv.TERM_CRITERIA_EPS | cv.TERM_CRITERIA_COUNT, 10, 0.03))
 # The video feed is read in as a VideoCapture object
-cap = cv.VideoCapture("./resources/task-1-clipped.mp4")
+cap = cv.VideoCapture("/home/anshumaan/Development/College/agv-selection-task/task-1/resources/task-1-clipped.mp4")
+# cap = cv.VideoCapture(0)
+
 # Variable for color to draw optical flow track
 color = (0, 255, 0)
 # ret = a boolean return value from getting the frame, first_frame = the first frame in the entire video sequence
@@ -52,6 +54,7 @@ while(cap.isOpened()):
 
     prev_gray = gray.copy()
     # Frames are read by intervals of 10 milliseconds. The programs breaks out of the while loop when the user presses the 'q' key
+    # cv.waitKey(0)
     if cv.waitKey(10) & 0xFF == ord('q'):
         break
 # The following frees up resources and closes all windows

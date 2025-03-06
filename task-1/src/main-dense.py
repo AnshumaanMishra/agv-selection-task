@@ -2,7 +2,8 @@ import cv2 as cv
 import numpy as np
 
 # The video feed is read in as a VideoCapture object
-cap = cv.VideoCapture("./resources/task-1-clipped.mp4")
+# cap = cv.VideoCapture("./resources/task-1-clipped.mp4")
+cap = cv.VideoCapture(0)
 # ret = a boolean return value from getting the frame, first_frame = the first frame in the entire video sequence
 ret, first_frame = cap.read()
 # Converts frame to grayscale because we only need the luminance channel for detecting edges - less computationally expensive
@@ -32,7 +33,7 @@ while(cap.isOpened()):
     # Converts HSV to RGB (BGR) color representation
     rgb = cv.cvtColor(mask, cv.COLOR_HSV2BGR)
     # Opens a new window and displays the output frame
-    rgb = cv.resize(rgb, (0, 0), fx=0.5, fy=0.5)
+    # rgb = cv.resize(rgb, (0, 0), fx=0.5, fy=0.5)
     cv.imshow("dense optical flow", rgb)
     # Updates previous frame
     prev_gray = gray

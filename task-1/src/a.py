@@ -4,7 +4,7 @@ import numpy as np
 # Read the image
 # image = cv2.imread('/home/anshumaan/Development/College/agv-selection-task/task-1/resources/chess.jpg')
 # image = cv2.imread('/home/anshumaan/Development/College/agv-selection-task/task-1/resources/chess.webp')
-cap = cv2.VideoCapture('/home/anshumaan/Development/College/agv-selection-task/task-1/resources/task-1-clipped.mp4')
+cap = cv2.VideoCapture('/home/anshumaan/Development/College/agv-selection-task/task-1/resources/untitled.mp4')
 # image = cv2.imread('/home/anshumaan/Development/College/agv-selection-task/task-1/resources/image.png')S
 feature_params = dict(maxCorners = 500, qualityLevel = 0.2, minDistance = 2, blockSize = 7)
 k = 0.04
@@ -20,6 +20,7 @@ xKernel = np.array([[-1, 0, 1], \
                     [-1, 0, 1]])
 
 ret, prev_frame = cap.read()
+prev_frame=cv2.resize(prev_frame, (800, 450))
 gray_frame = cv2.cvtColor(prev_frame, cv2.COLOR_BGR2GRAY)
 prev_corners = cv2.goodFeaturesToTrack(gray_frame, mask=None, **feature_params)
 def getLines(prev_frame, frame):
@@ -31,14 +32,13 @@ def getLines(prev_frame, frame):
         b = np.array([[0], [0]])
 
         y, x = int(ele[0][0]), int(ele[0][1])
+        if(x < 1 or y < 1):
+            continue
         mat = prev_frame[x - 1 : x + 2, y - 1 : y + 2]
         mat2 = frame[x - 1 : x + 2, y - 1 : y + 2]
         print(x, y, mat, mat2, sep='\n')
         Ix = xKernel.dot(mat)
         Iy = yKernel.dot(mat)
-        # Ix = cv2.Sobel(mat, cv2.CV_64F, 1, 0, ksize=3)
-        # Iy = cv2.Sobel(mat, cv2.CV_64F, 0, 1, ksize=3)
-        print("Ix Iy = ", Ix, Iy, sep='\n')
         It = mat2 - mat
         for j in range(0, 9):
             x1 = j // 3
@@ -50,10 +50,16 @@ def getLines(prev_frame, frame):
             b += np.array([[-1 * Ixi * Iti], [-1 * Iyi * Iti]])
         
         velocities = np.linalg.pinv(A).dot(b)
-        print(velocities)
-        corners[i][0][0] += velocities[0][0]
-        corners[i][0][1] += velocities[1][0]
-        return corners
+        v2 = velocities.copy()
+        # while((v2[0][0] < 1 and v2[0][0] >= -1) and (v2[1][0] < 1 and v2[1][0] >= -1)):
+        #     if(v2[1][0] == 0 and v2[0][0] == 0):
+        #         break
+        #     v2 += velocities
+        #     # print(v2)
+        print("Velocities = ", v2)
+        corners[i][0][0] -= v2[1][0]
+        corners[i][0][1] -= v2[0][0]
+    return corners
 
 
 def plotCorners(image, corners, color):
@@ -62,6 +68,7 @@ def plotCorners(image, corners, color):
 
 while 1:
     ret, frame = cap.read()
+    frame=cv2.resize(frame, (800, 450))
     gray_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
     gray_prev_frame = cv2.cvtColor(prev_frame, cv2.COLOR_BGR2GRAY)
     m, n = gray_frame.shape
@@ -69,13 +76,13 @@ while 1:
     corners = getLines(gray_prev_frame, gray_frame)
     print(corners - prev_corners)
     plotCorners(frame, corners, (255, 255, 0))
-    plotCorners(frame, prev_corners, (0, 255, 255))
-    # cv2.waitKey(0)
-    output = cv2.resize(frame, (0, 0), fx=0.5, fy=0.5)
+    # plotCorners(frame, prev_corners, (0, 255, 255))
+    # output = cv2.resize(frame, (0, 0), fx=0.5, fy=0.5)
 
-    cv2.imshow("Cornered Image", output)
-    prev_frame = frame
-    prev_corners = corners
+    cv2.imshow("Cornered Image", frame)
+    prev_frame = frame.copy()
+    prev_corners = corners.copy()
+    # cv2.waitKey(0)
     if (cv2.waitKey(10) & 0xFF == ord('q')):
         break
 
