@@ -37,7 +37,7 @@ pts1_2 = np.load("task-6/data/temple_coords.npz")
 
 pts2_c = sub.epipolar_correspondences(im1, im2, F_deN, pts1_2['pts1'])
 print(*F_deN, sep="\n")
-hlp.epipolarMatchGUI(im1, im2, F_deN)
+# hlp.epipolarMatchGUI(im1, im2, F_deN)
 # hlp.displayEpipolarF(im1, im2, F_deN)
 
 
